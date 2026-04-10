@@ -1,0 +1,59 @@
+import random
+import math
+
+# Sigmoid
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+# Derivative
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+# Dataset (XOR)
+data = [
+    ([0,0], 0),
+    ([0,1], 1),
+    ([1,0], 1),
+    ([1,1], 0)
+]
+
+# Initialize weights
+w1 = [[random.random(), random.random()],
+      [random.random(), random.random()]]
+w2 = [random.random(), random.random()]
+
+# Training
+for epoch in range(10000):
+    for inputs, target in data:
+        # Forward pass
+        h1 = sigmoid(inputs[0]*w1[0][0] + inputs[1]*w1[1][0])
+        h2 = sigmoid(inputs[0]*w1[0][1] + inputs[1]*w1[1][1])
+
+        output = sigmoid(h1*w2[0] + h2*w2[1])
+
+        # Error
+        error = target - output
+
+        # Backpropagation
+        d_output = error * sigmoid_derivative(output)
+
+        d_h1 = d_output * w2[0] * sigmoid_derivative(h1)
+        d_h2 = d_output * w2[1] * sigmoid_derivative(h2)
+
+        # Update weights
+        w2[0] += h1 * d_output
+        w2[1] += h2 * d_output
+
+        w1[0][0] += inputs[0] * d_h1
+        w1[1][0] += inputs[1] * d_h1
+
+        w1[0][1] += inputs[0] * d_h2
+        w1[1][1] += inputs[1] * d_h2
+
+# Testing
+print("Final Outputs:")
+for inputs, _ in data:
+    h1 = sigmoid(inputs[0]*w1[0][0] + inputs[1]*w1[1][0])
+    h2 = sigmoid(inputs[0]*w1[0][1] + inputs[1]*w1[1][1])
+    output = sigmoid(h1*w2[0] + h2*w2[1])
+    print(inputs, "->", round(output))
