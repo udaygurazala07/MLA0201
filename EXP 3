@@ -1,0 +1,30 @@
+import math
+
+def euclidean_distance(a, b):
+    return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+def knn(X, y, query, k):
+    distances = []
+
+    for i in range(len(X)):
+        dist = euclidean_distance(X[i], query)
+        distances.append((dist, y[i]))
+
+    distances.sort()
+    neighbors = distances[:k]
+
+    # Voting
+    votes = {}
+    for _, label in neighbors:
+        votes[label] = votes.get(label, 0) + 1
+
+    return max(votes, key=votes.get)
+
+
+# Dataset
+X = [[1,2],[2,3],[3,4],[6,7],[7,8],[8,9]]
+y = [0,0,0,1,1,1]
+
+query = [5,5]
+
+print("Prediction:", knn(X, y, query, 3))
