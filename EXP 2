@@ -1,0 +1,42 @@
+def candidate_elimination(data):
+    num_attr = len(data[0]) - 1
+
+    S = ['0'] * num_attr
+    G = [['?'] * num_attr]
+
+    for example in data:
+        if example[-1] == "Yes":
+            for i in range(num_attr):
+                if S[i] == '0':
+                    S[i] = example[i]
+                elif S[i] != example[i]:
+                    S[i] = '?'
+
+            G = [g for g in G if all(g[i] == '?' or g[i] == S[i] for i in range(num_attr))]
+
+        else:
+            new_G = []
+            for g in G:
+                for i in range(num_attr):
+                    if g[i] == '?':
+                        if S[i] != example[i]:
+                            new_h = g.copy()
+                            new_h[i] = S[i]
+                            new_G.append(new_h)
+            G = new_G
+
+    return S, G
+
+
+# Dataset
+data = [
+    ["Sunny", "Warm", "Normal", "Strong", "Warm", "Same", "Yes"],
+    ["Sunny", "Warm", "High", "Strong", "Warm", "Same", "Yes"],
+    ["Rainy", "Cold", "High", "Strong", "Warm", "Change", "No"],
+    ["Sunny", "Warm", "High", "Strong", "Cool", "Change", "Yes"]
+]
+
+S, G = candidate_elimination(data)
+
+print("Specific Hypothesis S:", S)
+print("General Hypothesis G:", G)
