@@ -1,0 +1,24 @@
+def find_s(data):
+    hypothesis = None
+
+    for example in data:
+        if example[-1] == "Yes":  # positive example
+            if hypothesis is None:
+                hypothesis = example[:-1]
+            else:
+                for i in range(len(hypothesis)):
+                    if hypothesis[i] != example[i]:
+                        hypothesis[i] = "?"
+
+    return hypothesis
+
+
+# Dataset
+data = [
+    ["Sunny", "Warm", "Normal", "Strong", "Warm", "Same", "Yes"],
+    ["Sunny", "Warm", "High", "Strong", "Warm", "Same", "Yes"],
+    ["Rainy", "Cold", "High", "Strong", "Warm", "Change", "No"],
+    ["Sunny", "Warm", "High", "Strong", "Cool", "Change", "Yes"]
+]
+
+print("Final Hypothesis:", find_s(data))
