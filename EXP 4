@@ -1,0 +1,81 @@
+import math
+
+# Dataset: [Outlook, Temp, Play]
+data = [
+    ["Sunny", "Hot", "No"],
+    ["Sunny", "Mild", "No"],
+    ["Overcast", "Hot", "Yes"],
+    ["Rain", "Mild", "Yes"]
+]
+
+# Calculate entropy
+def entropy(data):
+    total = len(data)
+    count_yes = sum(1 for row in data if row[-1] == "Yes")
+    count_no = total - count_yes
+
+    def calc(p):
+        return -p * math.log2(p) if p != 0 else 0
+
+    return calc(count_yes/total) + calc(count_no/total)
+
+# Split dataset
+def split(data, attr_index, value):
+    return [row for row in data if row[attr_index] == value]
+
+# Get best attribute
+def best_attribute(data):
+    base_entropy = entropy(data)
+    best_gain = -1
+    best_attr = -1
+
+    for i in range(len(data[0]) - 1):
+        values = set(row[i] for row in data)
+        new_entropy = 0
+
+        for val in values:
+            subset = split(data, i, val)
+            weight = len(subset) / len(data)
+            new_entropy += weight * entropy(subset)
+
+        gain = base_entropy - new_entropy
+
+        if gain > best_gain:
+            best_gain = gain
+            best_attr = i
+
+    return best_attr
+
+# ID3 function
+def id3(data, attributes):
+    labels = [row[-1] for row in data]
+
+    if labels.count(labels[0]) == len(labels):
+        return labels[0]
+
+    if len(attributes) == 0:
+        return max(set(labels), key=labels.count)
+
+    best = best_attribute(data)
+    tree = {attributes[best]: {}}
+
+    values = set(row[best] for row in data)
+
+    for val in values:
+        subset = split(data, best, val)
+        if not subset:
+            tree[attributes[best]][val] = max(set(labels), key=labels.count)
+        else:
+            new_attrs = attributes[:best] + attributes[best+1:]
+            reduced_subset = [row[:best] + row[best+1:] for row in subset]
+            tree[attributes[best]][val] = id3(reduced_subset, new_attrs)
+
+    return tree
+
+
+attributes = ["Outlook", "Temp"]
+
+tree = id3(data, attributes)
+
+print("Decision Tree:")
+print(tree)
